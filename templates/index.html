@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZFlow CRM Dashboard</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/ZFlow_Logo.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+    <style>
+
+        :root {
+            /* Modern ZFlow Palette */
+            --bg-deep: #050505;
+            --bg-panel: #121212;
+            --bg-hover: #1e1e1e;
+            --border-subtle: #262626;
+            
+            --emerald-primary: #10b981;
+            --emerald-hover: #059669;
+            --emerald-glow: rgba(16, 185, 129, 0.15);
+            --emerald-chat: #064e3b;
+            
+            /* Royal Gold Integration 👑 */
+            --gold-royal: #D4AF37;
+            --gold-glow: rgba(212, 175, 55, 0.25);
+            
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --danger: #ef4444;
+        }
+
+        /* 🛑 THE GLOBAL HIDDEN FIX 🛑 */
+        [hidden] {
+            display: none !important;
+        }
+
+        /* 🤖 AUTOMATION NODE MATRIX BACKGROUND 🤖 */
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            
+            /* Faint Grid with Emerald & Gold Nodes */
+            background-image: 
+                radial-gradient(circle at 40px 40px, var(--gold-glow) 2px, transparent 3px),
+                radial-gradient(circle at 80px 80px, var(--emerald-glow) 2px, transparent 3px),
+                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
+        }
+
+        /* Header Styling */
+        .zflow-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 26px;
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--emerald-primary);
+        }
+
+        .zflow-header h4 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 15px var(--emerald-glow);
+        }
+
+        .zflow-header img {
+            width: 35px;
+            height: 35px;
+        }
+
+        /* Layout Containers */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left Sidebar */
+        .left {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            width: 280px;
+            min-width: 250px;
+            overflow: hidden;
+            background-color: rgba(18, 18, 18, 0.95);
+            border-right: 1px solid var(--border-subtle);
+            backdrop-filter: blur(5px);
+        }
+
+        .contacts {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-subtle);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--emerald-primary);
+        }
+
+        /* Contact List Items */
+        .contact {
+            margin: 0;
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .contact h4 {
+            margin: 0 0 4px 0;
+            font-size: 1rem;
+            color: var(--text-main);
+        }
+
+        .contact p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .contact:hover {
+            background-color: var(--bg-hover);
+        }
+
+        /* Selected Contact State - Integrated Gold! ✨ */
+        #selected {
+            background-color: var(--bg-hover);
+            border-left: 4px solid var(--gold-royal);
+            box-shadow: inset 20px 0 30px -20px var(--gold-glow);
+        }
+        #selected h4 {
+            color: var(--gold-royal);
+        }
+
+        /* Profile Section */
+        .profile {
+            margin-top: auto;
+            padding: 20px;
+            background-color: var(--bg-deep);
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .profile p {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .profile a {
+            text-decoration: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            color: var(--danger);
+            font-size: 0.85rem;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .profile a:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Right Chat Area */
+        .right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .right-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background-color: rgba(18, 18, 18, 0.95);
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 16px;
+            backdrop-filter: blur(5px);
+        }
+
+        #right-header-text p {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Buttons & Alerts */
+        .alert {
+            padding: 12px 16px;
+            align-self: center;
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            color: var(--danger);
+        }
+
+        .alert p {
+            margin: 0;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        #pauseBot {
+            background-color: transparent;
+            color: var(--emerald-primary);
+            border: 1px solid var(--emerald-primary);
+            cursor: pointer;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        #pauseBot:hover {
+            background-color: var(--emerald-glow);
+        }
+
+        /* Chat Messages */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 0 24px;
+        }
+
+        .in, .out {
+            font-family: "Cascadia Code", monospace;
+            font-size: 0.9rem;
+            max-width: 65%;
+            padding: 12px 18px;
+            margin: 8px 0;
+            line-height: 1.4;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        .in {
+            align-self: flex-start;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px 18px 18px 18px;
+        }
+
+        .out {
+            align-self: flex-end;
+            background-color: var(--emerald-chat);
+            color: var(--text-main);
+            border-radius: 18px 18px 4px 18px;
+            border: 1px solid var(--emerald-primary);
+        }
+
+        /* Input Area */
+        .interactive {
+            display: flex;
+            align-items: center;
+            padding: 20px 24px;
+            background-color: rgba(18, 18, 18, 0.95);
+            border-top: 1px solid var(--border-subtle);
+            gap: 16px;
+            backdrop-filter: blur(5px);
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--emerald-primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0; 
+        }
+
+        #live-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--emerald-primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        input {
+            flex: 1;
+            background-color: var(--bg-deep);
+            border: 1px solid var(--border-subtle);
+            height: 48px;
+            border-radius: 24px;
+            color: var(--text-main);
+            font-size: 1rem;
+            padding: 0px 20px;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--emerald-primary);
+            box-shadow: 0 0 0 3px var(--emerald-glow);
+        }
+
+        /* Send Button - Royal Gold Upgrade! 👑 */
+        .interactive button {
+            background-color: var(--gold-royal);
+            color: #000;
+            border: none;
+            cursor: pointer;
+            border-radius: 50%;
+            height: 48px;
+            width: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .interactive button:hover {
+            background-color: #F3C300; 
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        /* Responsive Tweaks */
+        @media (max-width: 768px) {
+            .left {
+                width: 80px;
+                min-width: 80px;
+            }
+            .contact h4, .profile p, #live-text {
+                display: none;
+            }
+            .profile {
+                justify-content: center;
+            }
+            .interactive {
+                flex-wrap: wrap;
+            }
+            input {
+                width: 100%;
+                flex: none;
+            }
+        }   
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+<body>
+    <div class="zflow-header">
+        <img src="{{ url_for('static', filename='images/ZFlow_Logo.png') }}" alt="ZFlow Logo">
+        <h4>ZFlow CRM Dashboard</h4>
+    </div>
+
+    <div class="container">
+
+        <div class="left">
+            <div class="contacts">
+                <div class="contact"></div>
+            </div>
+            <div class="profile">
+                <p>{{ data.user_name }}</p>
+                <a href="/reset">Log Out</a>
+            </div>
+        </div>
+
+        <div class="right">
+
+            <div class="right-header">
+                <div id="right-header-text"></div>
+                <button id="pauseBot" onclick="toggleBot()">⏸ Pause Bot</button>
+            </div>
+
+            <div class="chat-area">
+
+                <div class="alert" hidden>
+                    <p>Bot is paused. You're in manual mode now!</p>
+                </div>
+            </div>
+
+            <div class="interactive">
+
+                <div class="live-indicator">
+                    <span id="live-dot"></span>
+                    <span id="live-text"> ZFlow Bot Active </span>
+                </div>
+            
+                <input type="text" id="inpBar" hidden>
+                <button onclick="send()" id="sendButton" hidden><i class="fas fa-paper-plane"></i></button>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+<script>
+
+    var isSelected = false;
+    let currentNumber = '';
+    loadClients();
+    
+    function loadClients(){
+        fetch('http://127.0.0.1:5000/getClients').then(response => response.json()).then(data => {
+        const left = document.getElementsByClassName("contacts")[0];
+
+        data.forEach(client => {
+            const div = document.createElement('div');
+            div.className = 'contact';
+            const pName = document.createElement('h4');
+            const pNumber = document.createElement('p');
+            pNumber.className = 'number';
+
+            if (!isSelected){
+                const rightHeader = document.getElementById('right-header-text');
+                const p2 = document.createElement('p');
+                if (client.name){
+                    p2.textContent = client.name;
+                }
+                else{
+                    p2.textContent = '+'+client.number;
+                }
+                
+                rightHeader.appendChild(p2);
+                currentNumber = client.number;
+
+                div.id = "selected";
+                isSelected = true;
+
+                getchats('+'+currentNumber);
+            }
+
+            if (client.name){
+                pName.textContent = client.name;
+                pNumber.textContent = '+'+client.number;
+                div.appendChild(pName);
+                div.appendChild(pNumber);
+            }
+            else{
+                pNumber.textContent = '+'+client.number;
+                div.appendChild(pNumber);
+            }
+            left.appendChild(div);
+        });
+        })
+        .catch(error => {
+            alert("System failed!")
+        });
+    }
+
+
+    async function getchats(currentNumber){
+        
+        try{
+            const chatArea = document.getElementsByClassName("chat-area")[0];
+            chatArea.querySelectorAll(".in, .out").forEach(element => element.remove());
+            const response = await fetch('http://127.0.0.1:5000/getChats', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(
+                    {
+                        number: currentNumber,
+                    }
+                )
+            });
+            
+            const result = await response.json();
+            result.forEach(element => {
+                const chat_text = element.chat_text;
+                const dir = element.dir;                
+
+                const p = document.createElement('p');
+                p.textContent = chat_text;
+                p.className = dir;
+
+                chatArea.appendChild(p);
+
+            });
+        }
+        catch (error){
+            console.log(error);
+            alert("System error!");
+        }
+        
+    }
+
+    document.addEventListener("click", (e) => {
+        const div = e.target.closest(".contact");
+        if (!div) return;
+
+        const old = document.getElementById("selected");
+        if (old) old.removeAttribute("id");
+
+        div.id = 'selected';
+
+        if (div) {
+            const p = div.querySelector("p");
+            currentNumber = div.querySelector(".number").textContent;
+            const rightHeader = document.getElementById('right-header-text');
+            rightHeader.innerHTML = ""
+            const p2 = document.createElement('p');
+            if (div.querySelector("h4")){
+                p2.textContent = div.querySelector("h4").textContent;
+                }
+            else{
+                p2.textContent = div.querySelector(".number").textContent;
+            }
+            rightHeader.appendChild(p2);
+            getchats(currentNumber);
+        }
+    });
+
+
+    async function send(){
+        const inpBar = document.getElementById("inpBar");
+        const chatArea = document.getElementsByClassName("chat-area")[0];
+        const text = inpBar.value.trim();
+        if(text === ""){
+            return;
+        }
+
+        try{
+            const response = await fetch('http://127.0.0.1:5000/sendMessage', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(
+                    {
+                        number: currentNumber,
+                        message: text
+                    }
+                )
+            });
+            
+            const result = await response.json();
+
+            if (result.success){
+            const bubble = document.createElement("div");
+            bubble.className = "out";
+            bubble.textContent = text;
+            inpBar.value = "";
+            chatArea.appendChild(bubble);
+            chatArea.scrollTop = chatArea.scrollHeight;
+            }
+            else{
+                alert("Failed "+result.error);
+            }
+        }
+        catch(error){
+            console.error(error);
+            alert("System error!")
+        }
+
+    }
+
+    function toggleBot(){
+        const inpBar = document.getElementById("inpBar");
+        const sendButton = document.getElementById("sendButton");
+        const toggleButton = document.getElementById("pauseBot");
+        const alertText = document.getElementsByClassName("alert")[0]; 
+        if (inpBar.hidden && sendButton.hidden){
+            botActive(false);
+            inpBar.hidden = false;
+            sendButton.hidden = false;
+            toggleButton.textContent = "▶ Resume Bot";
+            alertText.hidden = false;
+        }
+        else{
+            botActive(true);
+            inpBar.hidden = true;
+            sendButton.hidden = true;
+            toggleButton.textContent = "⏸ Pause Bot";
+            alertText.hidden = true;
+        }
+    }
+
+    function botActive(activeness){
+        const liveDotIndicator = document.getElementById("live-dot");
+        const liveTextIndicator = document.getElementById("live-text");
+        if (activeness){
+            liveDotIndicator.hidden = false;
+            liveTextIndicator.hidden = false;
+        }
+        else{
+            liveDotIndicator.hidden = true;
+            liveTextIndicator.hidden = true;   
+        }        
+    }
+
+    document.getElementById("inpBar").addEventListener("keydown", function(event){
+        if(event.key === "Enter"){
+            send();
+        }
+    });
+
+</script>
+</html>

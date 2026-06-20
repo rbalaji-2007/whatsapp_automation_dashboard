@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZFlow Login</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/ZFlow_Logo.png') }}">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:system-ui,sans-serif;
+        }
+
+        body{
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+
+            background:#0D1117;
+        }
+
+        .login-card{
+            background:#161B22;
+
+            width:350px;
+
+            padding:40px;
+
+            border-radius:16px;
+
+            border:1px solid #2D3748;
+
+            box-shadow:
+                0 0 30px rgba(16,185,129,.12);
+        }
+
+        h1{
+            text-align:center;
+
+            color:#10B981;
+
+            margin-bottom:10px;
+
+            font-size:30px;
+        }
+
+        .subtitle{
+            text-align:center;
+
+            color:#94A3B8;
+
+            margin-bottom:25px;
+
+            font-size:14px;
+        }
+
+        .input-group{
+            display:flex;
+            flex-direction:column;
+
+            margin-bottom:16px;
+        }
+
+        label{
+            color:#E2E8F0;
+
+            margin-bottom:6px;
+
+            font-size:14px;
+
+            font-weight:600;
+        }
+
+        input{
+            background:#0D1117;
+
+            color:white;
+
+            border:1px solid #2D3748;
+
+            border-radius:8px;
+
+            padding:12px;
+
+            outline:none;
+
+            transition:.2s;
+        }
+
+        input:focus{
+            border-color:#10B981;
+
+            box-shadow:
+                0 0 0 3px rgba(16,185,129,.15);
+        }
+
+        button{
+            width:100%;
+
+            padding:12px;
+
+            border:none;
+
+            border-radius:8px;
+
+            background:#10B981;
+
+            color:white;
+
+            font-size:15px;
+
+            font-weight:700;
+
+            cursor:pointer;
+
+            transition:.2s;
+        }
+
+        button:hover{
+            background:#059669;
+        }
+
+        button:active{
+            transform:scale(.98);
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="login-card">
+
+    <h1>🔐 ZFlow CRM</h1>
+
+    <p class="subtitle">
+        Sign in to continue
+    </p>
+
+    <form action="/submit" method="POST">
+
+        <div class="input-group">
+            <label>Username</label>
+            <input
+                type="text"
+                name="userName"
+                placeholder="Enter username"
+                required>
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input
+                type="password"
+                name="passwd"
+                placeholder="Enter password"
+                required>
+        </div>
+
+        <button type="submit">
+            Login
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>
